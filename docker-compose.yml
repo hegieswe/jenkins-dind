@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  jenkins:
+    build: .
+    container_name: jenkins
+    privileged: true
+    user: root # Dijalankan sebagai root agar bisa mengakses docker.sock (jika butuh build docker image di dalam Jenkins)
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_data:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock # Mount docker socket untuk Docker-in-Docker
+    restart: unless-stopped
+
+volumes:
+  jenkins_data:
