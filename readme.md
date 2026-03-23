@@ -50,8 +50,10 @@ Pastikan ID dari setiap kredensial *(ID field)* diketik persis sesuai dengan yan
 
 | Nama / ID Kredensial | Tipe Kredensial (*Kind*) | Kegunaan | Isi Minimal |
 | :--- | :--- | :--- | :--- |
-| **`dockerhub-credentials`** *(atau sejenisnya)* | `Username with password` | Agar skrip `ci.sh` diikutkan akses *Login* & berhak untuk me-*push* image terbaru ke repositori Docker Hub Anda. | **Username:** ID Docker Hub <br> **Password:** Akses Token / Password Docker Hub |
-| **`github-credentials`** *(atau sejenisnya)* | `Username with password` atau `Secret text` | Agar tahap akhir *Deploy* di `Jenkinsfile` (*GitOps*) diizinkan untuk men-*commit* file `kustomization.yaml` yang diperbarui (perubahan *image tag*) dan mem-*push*-nya kembali le GitHub. | **Username:** Username Github <br> **Password:** Github PAT *(Personal Access Token)* / Token SSH |
+| **`dockerhub-username`** | `Secret text` | Username login Dockerhub untuk `ci.sh` | Username Docker Hub Anda |
+| **`dockerhub-password`** | `Secret text` | Password login Dockerhub (Atau Access Token) | Akses Token Docker Hub Anda |
+| **`k8s-kubeconfig-file`** | `Secret file` | Mengizinkan jenkins agent berbicara dengan API server k3d | File `~/.kube/config` lokal Anda |
+| **`github-credentials`** | `Username with password` | Agar Jenkins diizinkan men-*commit* & mem-*push* file Kustomize GitOps | **Username:** Akun Github <br> **Password:** Github PAT / Token SSH |
 
 ---
 
