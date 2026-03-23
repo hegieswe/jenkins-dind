@@ -108,7 +108,9 @@ fi
 
 # ─── Step 3: Build ────────────────────────────────────────────────────────────
 ACTION_FLAG="--push"
-ATTEST_FLAGS=(--attest "type=sbom" --attest "type=provenance,mode=max")
+# Attestations (termasuk provenance default) sering menyebabkan proses push ke Docker Hub hang / stuck
+# atau error 400 Bad Request karena masalah kompatibilitas registry.
+ATTEST_FLAGS=(--provenance=false) 
 
 if [[ "$PUSH" == "false" ]]; then
   ACTION_FLAG="--load"
