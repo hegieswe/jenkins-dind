@@ -42,7 +42,20 @@ Untuk mematikan container:
 make down
 ```
 
-## Catatan Penting: Koneksi ke Local Kubernetes (K3d)
+## 🔐 Konfigurasi Kredensial Pipeline (Wajib)
+
+Sebelum Anda menjalankan tahapan *Build* (CI) dan *Deploy* (CD), Anda diwajibkan untuk mendaftarkan "Kunci Keamanan" di dalam dasbor **Manage Jenkins > Credentials > System > Global credentials**.
+
+Pastikan ID dari setiap kredensial *(ID field)* diketik persis sesuai dengan yang diminta oleh `Jenkinsfile` aplikasi Anda. Rinciannya sebagai berikut:
+
+| Nama / ID Kredensial | Tipe Kredensial (*Kind*) | Kegunaan | Isi Minimal |
+| :--- | :--- | :--- | :--- |
+| **`dockerhub-credentials`** *(atau sejenisnya)* | `Username with password` | Agar skrip `ci.sh` diikutkan akses *Login* & berhak untuk me-*push* image terbaru ke repositori Docker Hub Anda. | **Username:** ID Docker Hub <br> **Password:** Akses Token / Password Docker Hub |
+| **`github-credentials`** *(atau sejenisnya)* | `Username with password` atau `Secret text` | Agar tahap akhir *Deploy* di `Jenkinsfile` (*GitOps*) diizinkan untuk men-*commit* file `kustomization.yaml` yang diperbarui (perubahan *image tag*) dan mem-*push*-nya kembali le GitHub. | **Username:** Username Github <br> **Password:** Github PAT *(Personal Access Token)* / Token SSH |
+
+---
+
+## ☸️ Catatan Tambahan: Koneksi ke Local Kubernetes (K3d)
 Karena Jenkins ini berjalan **di dalam Docker container terisolasi**, ia memerlukan trik khusus untuk "berbicara" dengan cluster Kubernetes lokal Anda (seperti `k3d` di komuter Mac Anda):
 
 1. **API Port 0.0.0.0**: Pastikan cluster k3d Anda menerima koneksi dari semua network interface lokal (bukan hanya localhost 127.0.0.1), dengan menambah argumen: `--api-port 0.0.0.0:6443`.
