@@ -70,3 +70,38 @@ Karena Jenkins ini berjalan **di dalam Docker container terisolasi**, ia memerlu
    server: https://host.docker.internal:6443
    insecure-skip-tls-verify: true  # (Wajib ditambahkan jika menggunakan local cluster)
    ```
+
+---
+
+## 4. Prasyarat Repositori Aplikasi
+
+Berkat arsitektur *Jenkins DinD*, Anda **TIDAK PERLU LAGI** menyimpan `ci.sh` atau `cd.sh` di dalam repositori Anda! Kedua skrip komando itu sudah tertanam abadi (*Global Command*) di dalam mesin Jenkins.
+Satu-satunya syarat untuk di-\`push\` hanyalah file \`Jenkinsfile\` ke repositori (*root*) aplikasi Anda:
+
+```bash
+# Pastikan file ci.sh dan cd.sh SUDAH DIHAPUS dari folder lokal jika masih ada!
+rm -f ci.sh cd.sh
+
+git add Jenkinsfile
+git commit -m "feat: Add Jenkinsfile for GitOps Pipeline automation"
+git push origin main
+```
+
+---
+
+## 5. Membuat Tugas Jenkins Pipeline (Eksekusi ��)
+Sesuai standar penamaan GitOps profesional, nama *Job* Jenkins **WAJIB** persis sama dengan nama *Repository* Git aplikasinya.
+
+1. Di Dashboard Jenkins Anda, klik tombol menu **New Item**.
+2. Ketik nama repositori persis (misal: **`golang-gitops-project`**), centang ikon **Pipeline**, lalu klik **OK**.
+3. *Scroll* turun ke konfigurasi kelompok **Pipeline**.
+   - **Definition**: Ganti menjadi `Pipeline script from SCM`.
+   - **SCM**: Pilih `Git`.
+   - **Repository URL**: Masukkan URL repositori aplikasi (Contoh: `https://github.com/hegieswe/golang-gitops-project.git`).
+   - Masukkan **Credentials**: Pilih \`github-credentials\` yang Anda persiapkan tadi untuk mengunci *Source Code*.
+   - **Branch Specifier**: `*/main`
+   - **Script Path**: `Jenkinsfile`
+4. Klik tombol **Save**.
+5. Jalankan pemicu kompilasi dengan mengklik menu: **Build Now**!
+
+**Selesai!** Pipeline Anda sekarang akan otomatis mengambil kode, *build* Docker Image via instruksi `ci.sh`, mendorongnya ke Docker Hub, membobol `k8s-manifest` Anda, mengedit *Template* dengan revisi citra yang baru, dan mendedikasikan panggung *Deployment*-nya seutuhnya kepada **ArgoCD**!
