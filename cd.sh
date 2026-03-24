@@ -171,17 +171,18 @@ DEPLOY_START=$(date +%s)
 kubectl apply -k "$OVERLAY_DIR"
 rm -f "$KUST_BACKUP"
 
-# Tunggu rollout untuk semua service yang ada di overlay ini
-# Gunakan konvensi: Deployment name = gtech-hello-<folder_name>
-info "Menunggu rollout status..."
-for SVC in "${SERVICES[@]}"; do
-  # Deteksi jika deployment ada di manifest (optional check)
-  DEPLOY_NAME="gtech-hello-${SVC}"
-  if kubectl get deployment "$DEPLOY_NAME" -n "$NAMESPACE" &>/dev/null; then
-    info "Checking rollout status: ${DEPLOY_NAME}"
-    kubectl rollout status deployment/"$DEPLOY_NAME" -n "$NAMESPACE" --timeout=60s || warn "Rollout timeout untuk ${SVC}"
-  fi
-done
+# Tunggu rollout untuk semua Deployment yang ada di overlay ini secara otomatis
+info "Mendeteksi Deployment resource dari Kustomize..."
+DEPLOYMENTS=$(kubectl get -k "$OVERLAY_DIR" -o name 2>/dev/null | grep -i '^deployment' || true)
+
+if [[ -n "$DEPLOYMENTS" ]]; then
+  for DEPLOY_RES in $DEPLOYMENTS; do
+    info "Checking rollout status: ${DEPLOY_RES}"
+    kubectl rollout status "${DEPLOY_RES}" -n "$NAMESPACE" --timeout=60s || warn "Rollout timeout untuk ${DEPLOY_RES}"
+  done
+else
+  info "Tidak ada kind: Deployment yang perlu ditunggu pada overlay ini."
+fi
 
 DEPLOY_DURATION=$(( $(date +%s) - DEPLOY_START ))
 echo -e "\n${GREEN}${BOLD}✅ Deploy selesai dalam ${DEPLOY_DURATION}s${RESET}"
