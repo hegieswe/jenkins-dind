@@ -25,3 +25,17 @@ RUN rm -rf /var/lib/apt/lists/*
 COPY ci.sh /usr/local/bin/ci.sh
 COPY cd.sh /usr/local/bin/cd.sh
 RUN chmod +x /usr/local/bin/ci.sh /usr/local/bin/cd.sh
+
+# Ganti kembali ke user jenkins untuk menginstal plugin
+USER jenkins
+
+# Auto-install plugin yang dibutuhkan
+RUN jenkins-plugin-cli --plugins \
+    workflow-aggregator \
+    pipeline-stage-view \
+    git \
+    github-branch-source \
+    credentials-binding \
+    ws-cleanup \
+    ansicolor \
+    docker-workflow
