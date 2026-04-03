@@ -66,7 +66,7 @@ OVERLAY_DIR="overlays/${ENV}"
 
 # Namespace sesuai overlay (disesuaikan dengan isi kustomization.yaml)
 case "$ENV" in
-  development) NAMESPACE="test-project"  ;;
+  development) NAMESPACE="dev-project"  ;;
   staging)     NAMESPACE="staging-project"  ;;
   production)  NAMESPACE="prod-project" ;;
   *) err "Environment tidak valid: $ENV" ;;
